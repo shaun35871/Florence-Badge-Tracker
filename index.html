@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Florence's Labubu Daily Tracker</title>
+  <style>
+    body {
+      font-family: "Comic Sans MS", cursive, sans-serif;
+      padding: 20px;
+      background-color: #f5f5fa;
+      color: #333;
+    }
+    h1 {
+      color: #d45c9f;
+    }
+    label {
+      display: block;
+      margin: 5px 0;
+    }
+    .category {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 2px dashed #d45c9f;
+      border-radius: 15px;
+      background-color: #fff;
+    }
+    .submit-btn, .print-btn {
+      margin-top: 10px;
+      margin-right: 10px;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #ffb6c1;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+    .submit-btn:hover, .print-btn:hover {
+      background-color: #ff69b4;
+    }
+    .total-badges {
+      font-size: 20px;
+      color: green;
+      margin-top: 20px;
+    }
+    #weeklySummary {
+      margin-top: 30px;
+      font-size: 18px;
+      background-color: #fff8dc;
+      padding: 10px;
+      border-radius: 10px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <h1>🌟 Florence's Labubu Daily Tracker 🌟</h1>
+  <label style="font-size: 20px; color: #d45c9f;">Date:
+    <input type="date" id="dateInput" style="font-size: 16px; color: #d45c9f;">
+  </label>
+
+  <form id="trackerForm">
+    <div class="category" data-category="Exercise">
+      <h2>Exercise</h2>
+      <label><input type="checkbox" name="badge"> 100 burpees</label>
+      <label><input type="checkbox" name="badge"> 100 jump-and-touch, jumping jacks or speed skaters</label>
+      <label><input type="checkbox" name="badge"> 3-minute plank</label>
+      <label><input type="checkbox" name="badge"> 10 minutes of stretching</label>
+      <label><input type="checkbox" name="badge"> Athletics / Tennis / Squash / Dance / Swim</label>
+    </div>
+
+    <div class="category" data-category="Schoolwork">
+      <h2>Schoolwork</h2>
+      <label><input type="checkbox" name="badge"> All homework done on time</label>
+      <label><input type="checkbox" name="badge"> High scores for homework</label>
+      <label><input type="checkbox" name="badge"> High scores for tests (3x for exams)</label>
+      <label><input type="checkbox" name="badge"> Additional academic work</label>
+    </div>
+
+    <div class="category" data-category="Writing">
+      <h2>Writing</h2>
+      <label><input type="checkbox" name="badge"> Complete 30-45 min writing course</label>
+      <label><input type="checkbox" name="badge"> Write in diary</label>
+      <label><input type="checkbox" name="badge"> Write in diary (in Chinese)</label>
+    </div>
+
+    <div class="category" data-category="Music">
+      <h2>Music</h2>
+      <label><input type="checkbox" name="badge"> Complete 45 min of piano or violin</label>
+      <label><input type="checkbox" name="badge"> Additional 30 min of piano or violin</label>
+      <label><input type="checkbox" name="badge"> Play piano or violin with GREAT attitude</label>
+    </div>
+
+    <div class="category" data-category="Mental Attitude">
+      <h2>Mental Attitude</h2>
+      <label><input type="checkbox" name="badge"> Show your desire (I WANT IT BADLY!)</label>
+      <label><input type="checkbox" name="badge"> No procrastination (JUST GET UP AND DO IT!)</label>
+      <label><input type="checkbox" name="badge"> STAY CALM AND BE POSITIVE!</label>
+    </div>
+
+    <div class="category" data-category="Siblings Care">
+      <h2>Siblings Care</h2>
+      <label><input type="checkbox" name="badge"> Take initiative to be kind</label>
+      <label><input type="checkbox" name="badge"> Be considerate and willing to give in</label>
+      <label><input type="checkbox" name="badge"> Teach or read</label>
+      <label><input type="checkbox" name="badge"> Lead them to do exercises</label>
+      <label><input type="checkbox" name="badge"> Play with them</label>
+    </div>
+
+    <div class="category">
+      <h2>Daily Bonus</h2>
+      <p><strong>Note:</strong> +2 bonus badges if at least one task is completed in each category. This is calculated automatically.</p>
+    </div>
+
+    <button type="button" class="submit-btn" onclick="submitDay()">Submit</button>
+    <button type="button" class="print-btn" onclick="window.print()">🖨️ Print or Save</button>
+    <div class="total-badges" id="result"></div>
+    <div id="weeklySummary"></div>
+  </form>
+
+  <script>
+    const weeklyScores = [];
+
+    function submitDay() {
+      const form = document.getElementById("trackerForm");
+      const categories = form.querySelectorAll('.category[data-category]');
+      let allCategoriesCompleted = true;
+      let badgeCount = 0;
+
+      categories.forEach(category => {
+        const hasChecked = category.querySelectorAll('input[name="badge"]:checked').length > 0;
+        if (!hasChecked) allCategoriesCompleted = false;
+        badgeCount += category.querySelectorAll('input[name="badge"]:checked').length;
+      });
+
+      const bonus = allCategoriesCompleted ? 2 : 0;
+      const total = badgeCount + bonus;
+      const date = document.getElementById("dateInput").value;
+      document.getElementById("result").innerText = `Badges Earned on ${date}: ${total}`;
+
+      weeklyScores.push({ date, total });
+
+      if (new Date(date).getDay() === 0) {
+        const sum = weeklyScores.reduce((acc, curr) => acc + curr.total, 0);
+        let summary = `<h3>🎉 Weekly Summary 🎉</h3>`;
+        weeklyScores.forEach(entry => {
+          summary += `<p>${entry.date}: ${entry.total} badges</p>`;
+        });
+        summary += `<strong>Total this week: ${sum} badges</strong>`;
+        document.getElementById("weeklySummary").innerHTML = summary;
+        document.getElementById("weeklySummary").style.display = 'block';
+        weeklyScores.length = 0;
+      }
+
+      form.reset();
+    }
+  </script>
+</body>
+</html>
